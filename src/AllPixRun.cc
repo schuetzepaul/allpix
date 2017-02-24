@@ -490,8 +490,8 @@ void AllPixRun::FillTelescopeFiles(const G4Run* aRun, G4String folderName, G4boo
  */
 void AllPixRun::RecordEvent(const G4Event* evt) {
 
-  RecordHits(evt);
-  RecordDigits(evt);
+  //  RecordHits(evt);
+  //  RecordDigits(evt);
   if (m_writeTPixTelescopeFilesFlag || m_writeEUTelescopeFilesFlag)
     RecordTelescopeDigits(evt);
 
