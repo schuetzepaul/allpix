@@ -124,9 +124,9 @@ inline G4ThreeVector bilinear(const G4ThreeVector* ecube, const G4double x, cons
 	G4ThreeVector result;
 
 	G4ThreeVector bil_y1 = linear(ecube[0+2*0+4*z], ecube[1+2*0+4*z], x);
-  G4ThreeVector bil_y2 = linear(ecube[0+2*1+4*z], ecube[1+2*1+4*z], x);
+	G4ThreeVector bil_y2 = linear(ecube[0+2*1+4*z], ecube[1+2*1+4*z], x);
 
-  return linear(bil_y1, bil_y2, y);
+	return linear(bil_y1, bil_y2, y);
 
 }
 

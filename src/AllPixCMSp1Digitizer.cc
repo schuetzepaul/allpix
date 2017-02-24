@@ -102,10 +102,10 @@ void AllPixCMSp1Digitizer::InitVariables(){
 	// Boltzmann_kT = 1.38e-23*Temperature; // J
 	
 	Target_Spatial_Precision = 1e-10;
-	Timestep_max = 0.1e-9;
-	Timestep_min = 0.005e-9;
+	Timestep_max = 0.4e-9;
+	Timestep_min = 0.05e-9;
 	
-	Electron_Scaling = 10;
+	Electron_Scaling = 20;
 	
 	// Variables for Smearing and Digitizing
 	threshold = gD->GetThreshold();
@@ -367,6 +367,11 @@ G4ThreeVector AllPixCMSp1Digitizer::ElectronSpeed(const G4ThreeVector efield){
 	
 	G4ThreeVector speed = mobility*(term[0]+term[1]+term[2])/rnorm;
 	
+	if(speed[2] < 0.){
+	  speed[2] = 100.;
+	}
+
+		
 	return speed;
 	
 }
@@ -391,14 +396,14 @@ G4ThreeVector AllPixCMSp1Digitizer::DiffusionStep(const G4double timestep, const
 void AllPixCMSp1Digitizer::SetDt(G4double& dt, const G4double uncertainty, const G4double z, const G4double dz){
 	
 	G4double dt_init = dt;
-	
-	if(uncertainty > Target_Spatial_Precision){dt *= 0.7;}
-	if(uncertainty < 0.5*Target_Spatial_Precision){dt *= 2;}
+
+	if(uncertainty > Target_Spatial_Precision){dt *= 0.6;}
+	if(detectorThickness-z > dz*2.2 && uncertainty < 0.5*Target_Spatial_Precision){dt *= 2;}
 	
 	if(dt > Timestep_max){dt = Timestep_max;}
 	if(dt < Timestep_min){dt = Timestep_min;}
 	
-	if(detectorThickness-z < dz*1.2){dt = dt_init*0.7;}
+	if(detectorThickness-z < dz*1.5 || detectorThickness-z < detectorThickness/20.){dt = Timestep_min;}
 	
 }
 
@@ -429,19 +434,23 @@ G4double AllPixCMSp1Digitizer::Propagation(G4ThreeVector& pos, G4double& driftti
 
 	while((pos[2] < detectorThickness) && (pos[2] > 0.))
 	{
-		
+
 		if(drifttime > trappingTime){
 			trapped = true;
 			break;
 		}
-		
-		deltapoint = RKF5Integration(pos,dt);
+		try{
+		  deltapoint = RKF5Integration(pos,dt);
+		}catch(...){
+		  G4cout << G4endl << "Got an exception here at pos = " << pos << ". Handle particle as trapped." << G4endl << G4endl;
+		  trapped = true;
+		  break;
+		}
 		for (size_t i = 0; i < 3; i++) {pos[i]+=deltapoint[i]/nm*um;}
 		drifttime += dt;
 
 
 		pos += DiffusionStep(dt, pos);
-
 
 		// Adapt step size 
 		SetDt(dt, deltapoint[3], pos[2], deltapoint[2]/nm*um);
@@ -452,6 +461,7 @@ G4double AllPixCMSp1Digitizer::Propagation(G4ThreeVector& pos, G4double& driftti
 	// G4cout << "Endposition: " << pos << G4endl;
 	// G4cout << "Total drift time in ns: " << drifttime*1e9 << G4endl;
 	// G4cout << "Step count: " << nsteps << G4endl;
+
 	
 	return drifttime;
 	
