@@ -66,10 +66,10 @@ AllPixCMSp1Digitizer::~AllPixCMSp1Digitizer(){
 }
 
 void AllPixCMSp1Digitizer::InitVariables(){
-	
+
 	// gD contains info on sensor and surroundings (bfield, temperature, ...)
 	gD = GetDetectorGeoDscPtr();
-	
+
 	bfield = gD->GetMagField();
 	detectorThickness = gD->GetSensorZ();
 	Temperature = gD->GetTemperature();
@@ -114,11 +114,16 @@ void AllPixCMSp1Digitizer::InitVariables(){
 	thresholdSmear = 100.;
 	ADCSmear = 2.;
 	gaincalParameters = new G4double[5];
-	gaincalParameters[0] = 0.999745;
-	gaincalParameters[1] = 287117.6;
-	gaincalParameters[2] = 4853.0;
-	gaincalParameters[3] = -257.8;
-	gaincalParameters[4] = 227.6;
+	//gaincalParameters[0] = 0.999745;0.999760;
+	//gaincalParameters[1] = 287117.6;301728.6
+	//gaincalParameters[2] = 4853.0;4991.4
+	//gaincalParameters[3] = -257.8;-218.7
+	//gaincalParameters[4] = 227.6;191.4
+	gaincalParameters[0] = 0.999755;
+	gaincalParameters[1] = 299109.3;
+	gaincalParameters[2] = 4856.2;
+	gaincalParameters[3] = -222.2;
+	gaincalParameters[4] = 186.3;
 	
 	// Variables for Trapping
 	Electron_Trap_beta0 = 5.65e-7; // cm2/s
@@ -132,9 +137,13 @@ void AllPixCMSp1Digitizer::InitVariables(){
 		Electron_Trap_TauEff = Electron_Trap_TauNoFluence;
 	}
 
-	if(skipPropagation = gD->GetSkipPropagation()){
+	skipPropagation = gD->GetSkipPropagation();
+	if(skipPropagation){
 	  G4cout << "--------- Skipping Propagation for detID " << gD->GetID() << ". Use created charge instead!" << G4endl;
 	}
+
+	numberOfPropagations = 0;
+	numberOfRKFsteps = 0;
 
 }
 
@@ -147,8 +156,8 @@ inline G4int AllPixCMSp1Digitizer::ADC(const G4double digital){
 }
 
 void AllPixCMSp1Digitizer::Digitize(){
-	
-	// create the digits collection
+
+  	// create the digits collection
 	m_digitsCollection = new AllPixCMSp1DigitsCollection("AllPixCMSp1Digitizer", collectionName[0] );
 	
 	// get the digiManager
@@ -178,7 +187,7 @@ void AllPixCMSp1Digitizer::Digitize(){
 	G4ThreeVector position;
 	
 	for(G4int itr  = 0 ; itr < nEntries ; itr++) {
-		
+
 		// Calculate number of electrons
 		createdElectronsStep = 1e6*eV*CLHEP::RandGauss::shoot((*hitsCollection)[itr]->GetEdep()/elec,TMath::Sqrt((*hitsCollection)[itr]->GetEdep()/elec)*0.118);
 		
@@ -220,6 +229,9 @@ void AllPixCMSp1Digitizer::Digitize(){
 		}
 		
 	} // Charge collection
+
+	G4cout << "Performed " << numberOfPropagations << " propagations." << G4endl;
+	G4cout << "Performed " << numberOfRKFsteps << " RKF steps." << G4endl;
 	
 	// Loop over all pixels for smearing, ADC and storage
 	
@@ -241,9 +253,8 @@ void AllPixCMSp1Digitizer::Digitize(){
 		
 		if(pixelCharge > smearedThreshold)
 		{
-			
+
 			pixelADC = ADC(pixelCharge);
-			
 			pixelADC += round(CLHEP::RandGauss::shoot(0, ADCSmear));
 			
 			AllPixCMSp1Digit * digit = new AllPixCMSp1Digit;
@@ -272,6 +283,9 @@ void AllPixCMSp1Digitizer::Digitize(){
 
 vector<G4double>  AllPixCMSp1Digitizer::RKF5Integration(G4ThreeVector position, G4double dt)
 {
+  
+        numberOfRKFsteps++;
+  
 	// This function transport using Euler integration, for field (Ex,Ey,Ez),
 	// considered constant over time dt. The movement equation are those
 	// of charges in semi-conductors, sx= mu*E*dt;;
@@ -324,18 +338,19 @@ vector<G4double>  AllPixCMSp1Digitizer::RKF5Integration(G4ThreeVector position, 
 	deltapoint[1]=deltaposition[1];
 	deltapoint[2]=deltaposition[2];
 	deltapoint[3]=(Erreur);
-	
+
 	return deltapoint;
 	
 }
 
-G4double AllPixCMSp1Digitizer::MobilityElectron(const G4ThreeVector efield){
+inline G4double AllPixCMSp1Digitizer::MobilityElectron(const G4ThreeVector efield){
 	
 	// calculate mobility in m2/V/s
 	
-	G4double mobility = Electron_Mobility * TMath::Power((1.+ TMath::Power(efield.mag()/Electron_ec,Electron_Beta)),-1.0/Electron_Beta);
-	// G4cout << "Mobility: " << mobility << G4endl;
-	return mobility;
+	// G4double mobility = Electron_Mobility * TMath::Power((1.+ TMath::Power(efield.mag()/Electron_ec,Electron_Beta)),-1.0/Electron_Beta);
+	//G4cout << "Mobility2: " << mobility << G4endl;
+
+	return Electron_Mobility * TMath::Power((1.+ TMath::Power(efield.mag()/Electron_ec,Electron_Beta)),-1.0/Electron_Beta);
 
 }
 
@@ -360,14 +375,14 @@ G4ThreeVector AllPixCMSp1Digitizer::DiffusionStep(const G4double timestep, const
 	
 	G4ThreeVector diffusionVector;
 	
-	G4ThreeVector electricField = 100.*gD->GetEFieldFromMap(position);
-	G4double D = Boltzmann_kT*MobilityElectron(electricField);
+	//G4ThreeVector electricField = 100.*gD->GetEFieldFromMap(position);
+	G4double D = Boltzmann_kT*Electron_Mobility;
 	G4double Dwidth = TMath::Sqrt(2.*D*timestep);
-	
+
 	for (size_t i = 0; i < 3; i++) {
-		diffusionVector[i] = CLHEP::RandGauss::shoot(0.,Dwidth)*um;
+		diffusionVector[i] = CLHEP::RandGauss::shoot(0.,Dwidth);
 	}
-	
+
 	// TMath::Sqrt(2.*D*timestep);
 	return diffusionVector;
 	
@@ -398,11 +413,13 @@ G4double AllPixCMSp1Digitizer::GetTrappingTime(){
 */
 
 G4double AllPixCMSp1Digitizer::Propagation(G4ThreeVector& pos, G4double& drifttime, G4bool& trapped){
-	
+
+  numberOfPropagations++;
+  
 	vector<G4double> deltapoint(4);
 	
 	drifttime = 0.;
-	G4double dt = 0.01*1e-9;
+	G4double dt = Timestep_min*2;
 	
 	G4double trappingTime = GetTrappingTime();
 	

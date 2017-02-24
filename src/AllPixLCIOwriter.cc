@@ -193,6 +193,14 @@ void AllPixLCIOwriter::WriteEvent(int runnr, int eventID, map<int,vector<vector<
       sprintf(collectionName, "CMSPixelDUT");
     }else if(detId == 901){
       sprintf(collectionName, "CMSPixelREF");
+    }else if(detId == 4000){
+      sprintf(collectionName, "CMSPixel4000");
+    }else if(detId == 4001){
+      sprintf(collectionName, "CMSPixel4001");
+    }else if(detId == 4002){
+      sprintf(collectionName, "CMSPixel4002");
+    }else if(detId == 4003){
+      sprintf(collectionName, "CMSPixel4003");
     }else{
       sprintf(collectionName, "Det%d",detId);
     }

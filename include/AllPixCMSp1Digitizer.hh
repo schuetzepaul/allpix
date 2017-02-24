@@ -96,7 +96,7 @@ private:
   void InitVariables();
   
   vector<G4double> RKF5Integration(G4ThreeVector position, G4double dt);
-  G4double MobilityElectron(const G4ThreeVector efield);
+  inline G4double MobilityElectron(const G4ThreeVector efield);
   G4ThreeVector ElectronSpeed(const G4ThreeVector efield);
   G4ThreeVector DiffusionStep(const G4double timestep, const G4ThreeVector position);
   void SetDt(G4double& dt, const G4double uncertainty, const G4double z, const G4double dz);
@@ -105,7 +105,8 @@ private:
   
   G4double Propagation(G4ThreeVector& pos, G4double& drifttime, G4bool& trapped);
 
-
+  G4int numberOfPropagations;
+  G4int numberOfRKFsteps;
 
 };
 
