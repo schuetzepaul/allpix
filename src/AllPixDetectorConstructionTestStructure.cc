@@ -1148,6 +1148,8 @@ void AllPixDetectorConstruction::BuildTestStructure(int){
 		for( ; testStructItr != m_posVectorTestStructure.end() ; testStructItr++){
 		  posRel = (*testStructItr).second;
 		}
+		posRel[2] += thickness;
+		G4cout << "                   --------------------          posRel=" << posRel << G4endl;
 
 		G4RotationMatrix * rotMatrix;
 		map<int, G4RotationMatrix*>::iterator testStructItr2 = m_rotVectorTestStructure.begin();
