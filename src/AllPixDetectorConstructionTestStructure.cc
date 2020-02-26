@@ -1158,6 +1158,454 @@ void AllPixDetectorConstruction::BuildTestStructure(int){
 		  rotMatrix = (*testStructItr2).second;
 		}
 
+		//G4cout << "Cube tilted by deg: " << rotMatrix[0].getTheta()/deg << G4endl;
+
+		G4VisAttributes * visAtt_bp = new G4VisAttributes(G4Color::Blue());
+		visAtt_bp->SetLineWidth(1);
+		visAtt_bp->SetForceSolid(true);
+		m_TestStructure_log->SetVisAttributes(visAtt_bp);
+		
+		m_TestStructure_phys = new G4PVPlacement(rotMatrix,
+				posRel,
+				m_TestStructure_log,
+				"Box1",
+				expHall_log,
+				false,
+				0);
+		
+		break;
+	}
+	case 105:
+	{
+		G4cout << "Building 2 aluminum plates for 2D contrast tests" << G4endl;
+
+		map<int, G4ThreeVector>::iterator testStructItr3 = m_parVectorTestStructure.begin();
+
+		G4ThreeVector par;
+		for( ; testStructItr3 != m_parVectorTestStructure.end() ; testStructItr3++){
+		  par = (*testStructItr3).second;
+		}
+
+		G4cout << "Parameter vector: " << par << G4endl;
+
+		G4NistManager* nistman = G4NistManager::Instance();
+		G4Material * Aluminum = nistman->FindOrBuildMaterial("G4_Al");
+
+		G4double thickness0 = 5./2.*mm;
+		G4double thickness1 = 2.5/2.*mm;
+
+		G4double width = 20.*mm;
+		G4double height = 10.*mm;
+		G4Box * box0 = new G4Box("Box0", width, height, thickness0);
+		G4Box * box1 = new G4Box("Box1", width, height, thickness1);
+
+		G4UnionSolid *bothBox = new G4UnionSolid("bothBox",box0,box1,0,G4ThreeVector(0.,20.,0.));
+		
+		m_TestStructure_log = new G4LogicalVolume(bothBox, Aluminum, "bothBox");
+
+		
+		// Move the box down to align window with DUT based on macro value
+		map<int, G4ThreeVector>::iterator testStructItr = m_posVectorTestStructure.begin();
+
+		G4ThreeVector posRel;
+		for( ; testStructItr != m_posVectorTestStructure.end() ; testStructItr++){
+		  posRel = (*testStructItr).second;
+		}
+		G4cout << "                   --------------------          posRel=" << posRel << G4endl;
+
+		G4RotationMatrix * rotMatrix;
+		map<int, G4RotationMatrix*>::iterator testStructItr2 = m_rotVectorTestStructure.begin();
+
+		for( ; testStructItr2 != m_rotVectorTestStructure.end() ; testStructItr2++){
+		  rotMatrix = (*testStructItr2).second;
+		}
+
+		G4VisAttributes * visAtt_bp = new G4VisAttributes(G4Color::Blue());
+		visAtt_bp->SetLineWidth(1);
+		visAtt_bp->SetForceSolid(true);
+		m_TestStructure_log->SetVisAttributes(visAtt_bp);
+		
+		m_TestStructure_phys = new G4PVPlacement(rotMatrix,
+				posRel,
+				m_TestStructure_log,
+				"bothBox",
+				expHall_log,
+				false,
+				0);
+		
+		break;
+	}
+	case 106:
+	{
+		G4cout << "Building 2 LEAD (!!!) plates for 2D contrast tests" << G4endl;
+
+		map<int, G4ThreeVector>::iterator testStructItr3 = m_parVectorTestStructure.begin();
+
+		G4ThreeVector par;
+		for( ; testStructItr3 != m_parVectorTestStructure.end() ; testStructItr3++){
+		  par = (*testStructItr3).second;
+		}
+
+		G4cout << "Parameter vector: " << par << G4endl;
+
+		G4NistManager* nistman = G4NistManager::Instance();
+		G4Material * Lead = nistman->FindOrBuildMaterial("G4_Pb");
+
+		G4double thickness0 = 5./2.*mm;
+		G4double thickness1 = 2.5/2.*mm;
+
+		G4double width = 20.*mm;
+		G4double height = 10.*mm;
+		G4Box * box0 = new G4Box("Box0", width, height, thickness0);
+		G4Box * box1 = new G4Box("Box1", width, height, thickness1);
+
+		G4UnionSolid *bothBox = new G4UnionSolid("bothBox",box0,box1,0,G4ThreeVector(0.,20.,0.));
+		
+		m_TestStructure_log = new G4LogicalVolume(bothBox, Lead, "bothBox");
+
+		
+		// Move the box down to align window with DUT based on macro value
+		map<int, G4ThreeVector>::iterator testStructItr = m_posVectorTestStructure.begin();
+
+		G4ThreeVector posRel;
+		for( ; testStructItr != m_posVectorTestStructure.end() ; testStructItr++){
+		  posRel = (*testStructItr).second;
+		}
+		G4cout << "                   --------------------          posRel=" << posRel << G4endl;
+
+		G4RotationMatrix * rotMatrix;
+		map<int, G4RotationMatrix*>::iterator testStructItr2 = m_rotVectorTestStructure.begin();
+
+		for( ; testStructItr2 != m_rotVectorTestStructure.end() ; testStructItr2++){
+		  rotMatrix = (*testStructItr2).second;
+		}
+
+		G4VisAttributes * visAtt_bp = new G4VisAttributes(G4Color::Blue());
+		visAtt_bp->SetLineWidth(1);
+		visAtt_bp->SetForceSolid(true);
+		m_TestStructure_log->SetVisAttributes(visAtt_bp);
+		
+		m_TestStructure_phys = new G4PVPlacement(rotMatrix,
+				posRel,
+				m_TestStructure_log,
+				"bothBox",
+				expHall_log,
+				false,
+				0);
+		
+		break;
+	}
+	case 107:
+	{
+		//Two cubes with spherical holes inside (purpose X0 measurement)
+                G4cout << "Building cube with cutout and cylindrical and rectangular holes  for X0 measurements" << G4endl;
+
+		G4NistManager* nistman = G4NistManager::Instance();
+		G4Material * Nickel = nistman->FindOrBuildMaterial("G4_Ni");
+
+		G4double box1Size = 3.0*mm;
+		G4Box * box1 = new G4Box("Box1", box1Size, box1Size, box1Size);
+	        			 
+		//m_TestStructure_log = new G4LogicalVolume(box1, Aluminum, "Box1");
+
+
+		G4double box2Size = box1Size/2.;
+		G4Box * box2 = new G4Box("Box2", box2Size, box2Size, box2Size);
+
+		G4SubtractionSolid *cutBox = new G4SubtractionSolid("cutBox",box1,box2,0,G4ThreeVector(0,0,box1Size));
+		//m_TestStructure_log = new G4LogicalVolume(cutBox, Aluminum, "cutBox");
+
+		// Define multiple spheres and subtract them from the unit
+
+		G4RotationMatrix * rotTub = new G4RotationMatrix;
+		rotTub->rotateY( 90*deg );
+
+		G4double s1size = 0.5*mm;
+		G4double s1trans = 1.5*mm;
+		G4Tubs * tub1 = new G4Tubs("Tub1", 0., s1size, box1Size*1.2, 0.*deg, 360.*deg);
+		G4SubtractionSolid *cutBoxS1 = new G4SubtractionSolid("cutBoxS1",cutBox,tub1,rotTub,G4ThreeVector(0,s1trans,-s1trans));
+
+		G4double s2size = 0.2*mm;
+		G4double s2trans = 1.5*mm;
+		G4Tubs * tub2 = new G4Tubs("Tub2", 0., s2size, box1Size*1.2, 0.*deg, 360.*deg);
+		G4SubtractionSolid *cutBoxS2 = new G4SubtractionSolid("cutBoxS2",cutBoxS1,tub2,rotTub,G4ThreeVector(0,-s2trans,-s2trans));
+		
+		G4double s3size = 0.1*mm;
+		G4double s3trans = 0.*mm;
+		G4Tubs * tub3 = new G4Tubs("Tub3", 0., s3size, box1Size*1.2, 0.*deg, 360.*deg);
+		G4SubtractionSolid *cutBoxS3 = new G4SubtractionSolid("cutBoxS3",cutBoxS2,tub3,rotTub,G4ThreeVector(0,s3trans,-s3trans));
+
+		G4double s4size = 0.05*mm;
+		G4double s4trans = 1.5*mm;
+		G4Tubs * tub4 = new G4Tubs("Tub4", 0., s4size, box1Size*1.2, 0.*deg, 360.*deg);
+		G4SubtractionSolid *cutBoxS4 = new G4SubtractionSolid("cutBoxS4",cutBoxS3,tub4,rotTub,G4ThreeVector(0,-s4trans,0));
+
+		G4double box3Size = 0.2*mm;
+		G4double box3trans = 1.5*mm;
+		G4Box * box3 = new G4Box("Box3", box1Size*1.2, box3Size, box3Size);
+		G4SubtractionSolid *cutBoxS5 = new G4SubtractionSolid("cutBoxS5",cutBoxS4,box3,0,G4ThreeVector(0,0,-box3trans));
+
+		G4double box4Size = 0.1*mm;
+		G4double box4trans = 1.5*mm;
+		G4Box * box4 = new G4Box("Box4", box1Size*1.2, box4Size, box4Size);
+		G4SubtractionSolid *cutBoxS6 = new G4SubtractionSolid("cutBoxS6",cutBoxS5,box4,0,G4ThreeVector(0,box4trans,0));
+
+
+		m_TestStructure_log = new G4LogicalVolume(cutBoxS6, Nickel, "cutBoxS6");
+		
+		//m_TestStructure_log2 = new G4LogicalVolume(box2, Aluminum, "Box2");
+
+		// Move the box down to align window with DUT based on macro value
+		map<int, G4ThreeVector>::iterator testStructItr = m_posVectorTestStructure.begin();
+
+		// FIXME: Assuming that there is only one TestStructure
+		G4ThreeVector posRel;
+		for( ; testStructItr != m_posVectorTestStructure.end() ; testStructItr++){
+		  posRel = (*testStructItr).second;
+		}
+
+
+		G4RotationMatrix * rotMatrix;
+		map<int, G4RotationMatrix*>::iterator testStructItr2 = m_rotVectorTestStructure.begin();
+
+		for( ; testStructItr2 != m_rotVectorTestStructure.end() ; testStructItr2++){
+		  rotMatrix = (*testStructItr2).second;
+		}
+
+		G4cout << "Cube tilted by deg: " << rotMatrix[0].getTheta()/deg << G4endl;
+
+		G4VisAttributes * visAtt_bp = new G4VisAttributes(G4Color::Blue());
+		visAtt_bp->SetLineWidth(1);
+		visAtt_bp->SetForceSolid(true);
+		m_TestStructure_log->SetVisAttributes(visAtt_bp);
+		
+		m_TestStructure_phys = new G4PVPlacement(rotMatrix,
+				posRel,
+				m_TestStructure_log,
+				"Box1",
+				expHall_log,
+				false,
+				0);
+		
+		break;
+	}
+	case 108:
+	{
+		//Two cubes with spherical holes inside (purpose X0 measurement)
+                G4cout << "Building cube with cutout and cylindrical and rectangular holes  for X0 measurements" << G4endl;
+
+		G4NistManager* nistman = G4NistManager::Instance();
+		G4Material * Lead = nistman->FindOrBuildMaterial("G4_Pb");
+
+		G4double box1Size = 3.0*mm;
+		G4Box * box1 = new G4Box("Box1", box1Size, box1Size, box1Size);
+	        			 
+		//m_TestStructure_log = new G4LogicalVolume(box1, Aluminum, "Box1");
+
+
+		G4double box2Size = box1Size/2.;
+		G4Box * box2 = new G4Box("Box2", box2Size, box2Size, box2Size);
+
+		G4SubtractionSolid *cutBox = new G4SubtractionSolid("cutBox",box1,box2,0,G4ThreeVector(0,0,box1Size));
+		//m_TestStructure_log = new G4LogicalVolume(cutBox, Aluminum, "cutBox");
+
+		// Define multiple spheres and subtract them from the unit
+
+		G4RotationMatrix * rotTub = new G4RotationMatrix;
+		rotTub->rotateY( 90*deg );
+
+		G4double s1size = 0.5*mm;
+		G4double s1trans = 1.5*mm;
+		G4Tubs * tub1 = new G4Tubs("Tub1", 0., s1size, box1Size*1.2, 0.*deg, 360.*deg);
+		G4SubtractionSolid *cutBoxS1 = new G4SubtractionSolid("cutBoxS1",cutBox,tub1,rotTub,G4ThreeVector(0,s1trans,-s1trans));
+
+		G4double s2size = 0.2*mm;
+		G4double s2trans = 1.5*mm;
+		G4Tubs * tub2 = new G4Tubs("Tub2", 0., s2size, box1Size*1.2, 0.*deg, 360.*deg);
+		G4SubtractionSolid *cutBoxS2 = new G4SubtractionSolid("cutBoxS2",cutBoxS1,tub2,rotTub,G4ThreeVector(0,-s2trans,-s2trans));
+		
+		G4double s3size = 0.1*mm;
+		G4double s3trans = 0.*mm;
+		G4Tubs * tub3 = new G4Tubs("Tub3", 0., s3size, box1Size*1.2, 0.*deg, 360.*deg);
+		G4SubtractionSolid *cutBoxS3 = new G4SubtractionSolid("cutBoxS3",cutBoxS2,tub3,rotTub,G4ThreeVector(0,s3trans,-s3trans));
+
+		G4double s4size = 0.05*mm;
+		G4double s4trans = 1.5*mm;
+		G4Tubs * tub4 = new G4Tubs("Tub4", 0., s4size, box1Size*1.2, 0.*deg, 360.*deg);
+		G4SubtractionSolid *cutBoxS4 = new G4SubtractionSolid("cutBoxS4",cutBoxS3,tub4,rotTub,G4ThreeVector(0,-s4trans,0));
+
+		G4double box3Size = 0.2*mm;
+		G4double box3trans = 1.5*mm;
+		G4Box * box3 = new G4Box("Box3", box1Size*1.2, box3Size, box3Size);
+		G4SubtractionSolid *cutBoxS5 = new G4SubtractionSolid("cutBoxS5",cutBoxS4,box3,0,G4ThreeVector(0,0,-box3trans));
+
+		G4double box4Size = 0.1*mm;
+		G4double box4trans = 1.5*mm;
+		G4Box * box4 = new G4Box("Box4", box1Size*1.2, box4Size, box4Size);
+		G4SubtractionSolid *cutBoxS6 = new G4SubtractionSolid("cutBoxS6",cutBoxS5,box4,0,G4ThreeVector(0,box4trans,0));
+
+
+		m_TestStructure_log = new G4LogicalVolume(cutBoxS6, Lead, "cutBoxS6");
+		
+		//m_TestStructure_log2 = new G4LogicalVolume(box2, Aluminum, "Box2");
+
+		// Move the box down to align window with DUT based on macro value
+		map<int, G4ThreeVector>::iterator testStructItr = m_posVectorTestStructure.begin();
+
+		// FIXME: Assuming that there is only one TestStructure
+		G4ThreeVector posRel;
+		for( ; testStructItr != m_posVectorTestStructure.end() ; testStructItr++){
+		  posRel = (*testStructItr).second;
+		}
+
+
+		G4RotationMatrix * rotMatrix;
+		map<int, G4RotationMatrix*>::iterator testStructItr2 = m_rotVectorTestStructure.begin();
+
+		for( ; testStructItr2 != m_rotVectorTestStructure.end() ; testStructItr2++){
+		  rotMatrix = (*testStructItr2).second;
+		}
+
+		G4cout << "Cube tilted by deg: " << rotMatrix[0].getTheta()/deg << G4endl;
+
+		G4VisAttributes * visAtt_bp = new G4VisAttributes(G4Color::Blue());
+		visAtt_bp->SetLineWidth(1);
+		visAtt_bp->SetForceSolid(true);
+		m_TestStructure_log->SetVisAttributes(visAtt_bp);
+		
+		m_TestStructure_phys = new G4PVPlacement(rotMatrix,
+				posRel,
+				m_TestStructure_log,
+				"Box1",
+				expHall_log,
+				false,
+				0);
+		
+		break;
+	}
+	case 110:
+	{
+                G4cout << "Building cube for X0 measurements" << G4endl;
+
+		G4NistManager* nistman = G4NistManager::Instance();
+		G4Material * Aluminum = nistman->FindOrBuildMaterial("G4_Al");
+
+		G4double box1Size = 3.0*mm;
+		G4Box * box1 = new G4Box("Box1", box1Size, box1Size, box1Size);
+	        			 
+		m_TestStructure_log = new G4LogicalVolume(box1, Aluminum, "Box1");
+
+		// Move the box down to align window with DUT based on macro value
+		map<int, G4ThreeVector>::iterator testStructItr = m_posVectorTestStructure.begin();
+
+		// FIXME: Assuming that there is only one TestStructure
+		G4ThreeVector posRel;
+		for( ; testStructItr != m_posVectorTestStructure.end() ; testStructItr++){
+		  posRel = (*testStructItr).second;
+		}
+
+
+		G4RotationMatrix * rotMatrix;
+		map<int, G4RotationMatrix*>::iterator testStructItr2 = m_rotVectorTestStructure.begin();
+
+		for( ; testStructItr2 != m_rotVectorTestStructure.end() ; testStructItr2++){
+		  rotMatrix = (*testStructItr2).second;
+		}
+
+		G4cout << "Cube tilted by deg: " << rotMatrix[0].getTheta()/deg << G4endl;
+
+		G4VisAttributes * visAtt_bp = new G4VisAttributes(G4Color::Blue());
+		visAtt_bp->SetLineWidth(1);
+		visAtt_bp->SetForceSolid(true);
+		m_TestStructure_log->SetVisAttributes(visAtt_bp);
+		
+		m_TestStructure_phys = new G4PVPlacement(rotMatrix,
+				posRel,
+				m_TestStructure_log,
+				"Box1",
+				expHall_log,
+				false,
+				0);
+		
+		break;
+	}
+
+	case 111:
+	{
+                G4cout << "Building cube for X0 measurements" << G4endl;
+
+		G4NistManager* nistman = G4NistManager::Instance();
+		G4Material * Nickel = nistman->FindOrBuildMaterial("G4_Ni");
+
+		G4double box1Size = 3.0*mm;
+		G4Box * box1 = new G4Box("Box1", box1Size, box1Size, box1Size);
+	        			 
+		m_TestStructure_log = new G4LogicalVolume(box1, Nickel, "Box1");
+
+		// Move the box down to align window with DUT based on macro value
+		map<int, G4ThreeVector>::iterator testStructItr = m_posVectorTestStructure.begin();
+
+		// FIXME: Assuming that there is only one TestStructure
+		G4ThreeVector posRel;
+		for( ; testStructItr != m_posVectorTestStructure.end() ; testStructItr++){
+		  posRel = (*testStructItr).second;
+		}
+
+
+		G4RotationMatrix * rotMatrix;
+		map<int, G4RotationMatrix*>::iterator testStructItr2 = m_rotVectorTestStructure.begin();
+
+		for( ; testStructItr2 != m_rotVectorTestStructure.end() ; testStructItr2++){
+		  rotMatrix = (*testStructItr2).second;
+		}
+
+		G4cout << "Cube tilted by deg: " << rotMatrix[0].getTheta()/deg << G4endl;
+
+		G4VisAttributes * visAtt_bp = new G4VisAttributes(G4Color::Blue());
+		visAtt_bp->SetLineWidth(1);
+		visAtt_bp->SetForceSolid(true);
+		m_TestStructure_log->SetVisAttributes(visAtt_bp);
+		
+		m_TestStructure_phys = new G4PVPlacement(rotMatrix,
+				posRel,
+				m_TestStructure_log,
+				"Box1",
+				expHall_log,
+				false,
+				0);
+		
+		break;
+	}
+
+	case 112:
+	{
+                G4cout << "Building cube for X0 measurements" << G4endl;
+
+		G4NistManager* nistman = G4NistManager::Instance();
+		G4Material * Lead = nistman->FindOrBuildMaterial("G4_Pb");
+
+		G4double box1Size = 3.0*mm;
+		G4Box * box1 = new G4Box("Box1", box1Size, box1Size, box1Size);
+	        			 
+		m_TestStructure_log = new G4LogicalVolume(box1, Lead, "Box1");
+
+		// Move the box down to align window with DUT based on macro value
+		map<int, G4ThreeVector>::iterator testStructItr = m_posVectorTestStructure.begin();
+
+		// FIXME: Assuming that there is only one TestStructure
+		G4ThreeVector posRel;
+		for( ; testStructItr != m_posVectorTestStructure.end() ; testStructItr++){
+		  posRel = (*testStructItr).second;
+		}
+
+
+		G4RotationMatrix * rotMatrix;
+		map<int, G4RotationMatrix*>::iterator testStructItr2 = m_rotVectorTestStructure.begin();
+
+		for( ; testStructItr2 != m_rotVectorTestStructure.end() ; testStructItr2++){
+		  rotMatrix = (*testStructItr2).second;
+		}
+
 		G4cout << "Cube tilted by deg: " << rotMatrix[0].getTheta()/deg << G4endl;
 
 		G4VisAttributes * visAtt_bp = new G4VisAttributes(G4Color::Blue());
